@@ -6,11 +6,15 @@ namespace FpCSharp7.ProductDomain
 {
     public static class ProductModule
     {
-
-        public static IResult<AddProductRequest, IFailure> Validate(this AddProductRequest addProductRequest) =>
+        public static IResult<AddProductRequest, IFailure> ValidateAddProductResponse(this AddProductRequest addProductRequest) =>
              addProductRequest.Name.IsNullOrEmpty() ?
                 Failure.ValidationFailureResult<AddProductRequest>("Name can't be empty")
            : addProductRequest.ToSuccess<AddProductRequest, IFailure>();
+
+        public static IResult<GetProductRequest, IFailure> ValidateGetProductResponse(this GetProductRequest getProductRequest) =>
+            getProductRequest.ProductId <= 0 ?
+               Failure.ValidationFailureResult<GetProductRequest>("ProductId can't be negative")
+          : getProductRequest.ToSuccess<GetProductRequest, IFailure>();
 
         public static Product MapToNewProduct(AddProductRequest addProductRequest)
             => new Product(addProductRequest.Name);

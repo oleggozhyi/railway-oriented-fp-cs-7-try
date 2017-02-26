@@ -6,7 +6,7 @@ namespace FpCSharp7.DataAccess
 {
     public static class ProductRepo
     {
-        public static IResult<Product, IFailure> SaveProductAsync(Product product)
+        public static IResult<Product, IFailure> SaveProduct(Product product)
         {
             try
             {
@@ -19,5 +19,12 @@ namespace FpCSharp7.DataAccess
             }
         }
 
+        public static IResult<Product, IFailure> GetProduct(int productId)
+        {
+            var product = NonFunctionalDbWrapper.GetProduct(productId).Result;
+            return product != null
+                ? product.ToSuccess<Product, IFailure>()
+                : Failure.DataNotFoundFailureResult<Product>("Product", $"id = {productId}");
+        }
     }
 }

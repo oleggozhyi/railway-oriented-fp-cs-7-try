@@ -8,7 +8,7 @@ namespace FpCSharp7.Http
         public static string Serialize<T>(this T o) => JsonConvert.SerializeObject(o);
         public static (int statusCode, string content) ToHttpResponse<TResult>(this IResult<TResult, IFailure> result)
             => result is Success<TResult, IFailure> success
-                    ? (200, success.Serialize())
+                    ? (200, success.Value.Serialize())
              : result is Failure<TResult, IFailure> failure
                   ? failure.Error is ConflictFailure<TResult> conflict
                             ? (409, conflict.ReloadedModel.Serialize())

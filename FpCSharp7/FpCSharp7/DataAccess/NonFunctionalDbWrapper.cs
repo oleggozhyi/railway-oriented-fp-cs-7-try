@@ -21,5 +21,12 @@ namespace FpCSharp7.DataAccess
             product.Id = Interlocked.Increment(ref _nextId);
             _storage.Add(product.Id, product);
         }
+
+        public static async Task<Product> GetProduct(int productId)
+        {
+            await Task.Delay(200); // emulate db call latency
+            _storage.TryGetValue(productId, out Product product);
+            return product;
+        }
     }
 }

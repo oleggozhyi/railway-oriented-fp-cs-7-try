@@ -28,6 +28,20 @@ namespace FpCSharp7Failure
             controller.AddNewProduct(new AddProductRequest { Name = "Samsung Galaxy Note 7" })
                       .FormatHttpResult()
                       .Print();
+
+            controller.GetProduct(new GetProductRequest { ProductId = 0 })
+                      .FormatHttpResult()
+                      .Print();
+
+            controller.GetProduct(new GetProductRequest { ProductId = 2 })
+                      .FormatHttpResult()
+                      .Print();
+
+            controller.GetProduct(new GetProductRequest { ProductId = 1000 })
+                      .FormatHttpResult()
+                      .Print();
+
+
         }
 
         public static string FormatHttpResult(this (int statusCode, string content) httpResult)

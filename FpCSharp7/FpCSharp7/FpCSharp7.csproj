@@ -48,12 +48,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataAccess\ConflictException.cs" />
+    <Compile Include="DataAccess\NonFunctionalDbWrapper.cs" />
+    <Compile Include="DataAccess\ProductRepo.cs" />
+    <Compile Include="Http\Dto\AddProductRequest.cs" />
+    <Compile Include="Http\Dto\GetProductRequest.cs" />
+    <Compile Include="Http\HttpResponseHelper.cs" />
     <Compile Include="Http\ProductController.cs" />
+    <Compile Include="Http\Dto\ProductResponse.cs" />
     <Compile Include="Infrastructure\Extensions.cs" />
     <Compile Include="Infrastructure\Failure.cs" />
     <Compile Include="Infrastructure\Result.cs" />
     <Compile Include="Infrastructure\ResultExtensions.cs" />
     <Compile Include="Infrastructure\Unit.cs" />
+    <Compile Include="ProductDomain\ProductOrchestrator.cs" />
+    <Compile Include="ProductDomain\Product.cs" />
+    <Compile Include="ProductDomain\ProductModule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

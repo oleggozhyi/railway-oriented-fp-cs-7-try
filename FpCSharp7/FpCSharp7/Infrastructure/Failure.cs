@@ -1,9 +1,4 @@
 ﻿using FpCSharp7Failure.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FpCSharp7
 {
@@ -17,7 +12,7 @@ namespace FpCSharp7
             => Validation(message).ToFailureResult<T, IFailure>();
         public static IResult<T, IFailure> DataNotFoundFailureResult<T>(string data, string predicate)
             => DataNotFound(data, predicate).ToFailureResult<T, IFailure>();
-        public static IResult<TModel, IFailure> ConflictFailureResult<TModel>(TModel reloadedModel) 
+        public static IResult<TModel, IFailure> ConflictFailureResult<TModel>(TModel reloadedModel)
             => Conflict<TModel>(reloadedModel).ToFailureResult<TModel, IFailure>();
 
         public static IFailure Validation(string message) => new ValidationFailure(message);

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FpCSharp7Failure.Infrastructure
 {
@@ -10,10 +6,10 @@ namespace FpCSharp7Failure.Infrastructure
     {
         public static ArgumentOutOfRangeException OutOfRange() => new ArgumentOutOfRangeException();
 
-        public static IResult<TValue, TError> ToSuccess<TValue, TError>(this TValue value) 
+        public static IResult<TValue, TError> ToSuccess<TValue, TError>(this TValue value)
             => new Success<TValue, TError>(value);
 
-        public static IResult<TValue, TError> ToFailureResult<TValue, TError>(this TError error) 
+        public static IResult<TValue, TError> ToFailureResult<TValue, TError>(this TError error)
             => new Failure<TValue, TError>(error);
 
         public static IResult<TB, TError> Bind<TA, TB, TError>(this IResult<TA, TError> result,

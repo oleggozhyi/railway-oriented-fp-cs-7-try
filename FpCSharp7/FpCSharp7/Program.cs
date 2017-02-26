@@ -1,9 +1,7 @@
 ﻿using FpCSharp7.Http;
+using FpCSharp7.Http.Dto;
+using FpCSharp7.ProductDomain;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FpCSharp7Failure
 {
@@ -11,7 +9,10 @@ namespace FpCSharp7Failure
     {
         static void Main(string[] args)
         {
-            var controller = new ProductController();
+            var controller = new ProductController(
+                ProductOrchestrator.AddProductComposition,
+                ProductOrchestrator.GetProductComposition);
+
             controller.AddNewProduct(new AddProductRequest { Name = null })
                       .FormatHttpResult()
                       .Print();
@@ -28,6 +29,7 @@ namespace FpCSharp7Failure
                       .FormatHttpResult()
                       .Print();
         }
+
         public static string FormatHttpResult(this (int statusCode, string content) httpResult)
             => "================================\n"
             + $"Code = {httpResult.statusCode} \n {httpResult.content}\n"
@@ -35,5 +37,5 @@ namespace FpCSharp7Failure
         public static void Print(this string s) => Console.WriteLine(s);
     }
 
-    
+
 }

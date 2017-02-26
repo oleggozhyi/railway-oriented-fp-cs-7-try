@@ -8,7 +8,7 @@ namespace FpCSharp7Failure.Infrastructure
 {
     public static class Result
     {
-        private static ArgumentOutOfRangeException OutOfRange() => new ArgumentOutOfRangeException();
+        public static ArgumentOutOfRangeException OutOfRange() => new ArgumentOutOfRangeException();
 
         public static IResult<TValue, TError> ToSuccess<TValue, TError>(this TValue value) 
             => new Success<TValue, TError>(value);
@@ -28,6 +28,9 @@ namespace FpCSharp7Failure.Infrastructure
           : result is Failure<TA, TE1> failure ? function(failure.Error).ToFailureResult<TA, TE2>()
           : throw OutOfRange();
 
+        public static IResult<TB, TError> MapSuccess<TA, TB, TError>(this IResult<TA, TError> result,
+            Func<TA, TB> function) => result.Bind(x => function(x).ToSuccess<TB, TError>());
+
     }
 
     public static class ResultLinqExtensions
@@ -40,6 +43,6 @@ namespace FpCSharp7Failure.Infrastructure
             result.Bind(v1 => function(v1).Select(v2 => composer(v1, v2)));
 
         public static IResult<TB, TError> Select<TA, TB, TError>(this IResult<TA, TError> result,
-            Func<TA, TB> function) => result.Bind(x => function(x).ToSuccess<TB, TError>());
+            Func<TA, TB> function) => result.MapSuccess(function);
     }
 }

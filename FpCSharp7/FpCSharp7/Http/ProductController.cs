@@ -1,5 +1,6 @@
 ﻿using FpCSharp7.Infrastructure;
 using FpCSharp7Failure.Infrastructure;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,9 +13,24 @@ namespace FpCSharp7.Http
 {
     public class ProductController
     {
-        
-        public async Task<(int statusCode, string content)> AddNewProduct()
-        { }
+        public (int statusCode, string content) AddNewProduct(AddProductRequest addProductRequest)
+            => ProductModule.AddProductComposition(addProductRequest).ToHttpResponse();
+    }
+    public static class HttpResponseHelper
+    {
+        public static string Serialize<T>(this T o) => JsonConvert.SerializeObject(o);
+        public static (int statusCode, string content) ToHttpResponse<TResult>(this IResult<TResult, IFailure> result)
+            => result is Success<TResult, IFailure> success
+                    ? (200, success.Serialize())
+             : result is Failure<TResult, IFailure> failure
+                  ? failure.Error is ConflictFailure<TResult> conflict
+                            ? (409, conflict.ReloadedModel.Serialize())
+                  : failure.Error is DataNotFoundFailure dataNotFound
+                            ? (404, $"{dataNotFound.Data} not found by {dataNotFound.Predicate}")
+                  : failure.Error is ValidationFailure validation
+                            ? (400, validation.ValidationMessage)
+                  : (500, "Unknown failure : " + failure.Serialize())
+            : throw Result.OutOfRange(); 
     }
 
     public class AddProductRequest
@@ -45,6 +61,13 @@ namespace FpCSharp7.Http
     }
     public static class ProductModule
     {
+        public static IResult<ProductResponse, IFailure> AddProductComposition(AddProductRequest addProductRequest)
+            => from validatedRequest in addProductRequest.Validate()
+               from product in ProductModule.MapToNewProduct(validatedRequest).ToSuccess<Product, IFailure>()
+               let savedProduct = ProductModule.SaveProductAsync(product)
+               from response in ProductModule.MapResponseOrConflict(savedProduct)
+               select response;
+
         public static IResult<AddProductRequest, IFailure> Validate(this AddProductRequest addProductRequest) =>
              addProductRequest.Name.IsNullOrEmpty() ?
                 Failure.ValidationFailureResult<AddProductRequest>("Name can't be empty")
@@ -53,6 +76,14 @@ namespace FpCSharp7.Http
         public static Product MapToNewProduct(AddProductRequest addProductRequest)
             => new Product(addProductRequest.Name);
 
+        public static IFailure MapConflictResponse(IFailure failure) =>
+            failure is ConflictFailure<Product> conflict ?
+                Failure.Conflict(ProductResponse.FromProduct(conflict.ReloadedModel))
+          : failure;
+
+        public static IResult<ProductResponse, IFailure> MapResponseOrConflict(IResult<Product, IFailure> result)
+              => result.MapSuccess(ProductResponse.FromProduct).MapFailure(MapConflictResponse);
+
         public static IResult<Product, IFailure> SaveProductAsync(this Product product)
         {
             try
@@ -60,9 +91,9 @@ namespace FpCSharp7.Http
                 NonFunctionalDbWrapper.SaveAsync(product).Wait();
                 return product.ToSuccess<Product, IFailure>();
             }
-            catch (ConflictException ex)
+            catch (AggregateException ex) when(ex.InnerException is ConflictException conflictEx)
             {
-                return Failure.ConflictFailureResult(ex.GetReloadedModel<Product>());
+                return Failure.ConflictFailureResult(conflictEx.GetReloadedModel<Product>());
             }
         }
     }
@@ -87,15 +118,5 @@ namespace FpCSharp7.Http
             product.Id = Interlocked.Increment(ref _nextId);
             _storage.Add(product.Id, product);
         }
-    }
-
-    public static class ProductComposition
-    {
-        public static IResult<ProductResponse, IFailure> AddProductComposition(AddProductRequest addProductRequest) 
-            => from validatedRequest in addProductRequest.Validate()
-               from product in ProductModule.MapToNewProduct(validatedRequest).ToSuccess<Product, IFailure>()
-               from savedProduct in ProductModule.SaveProductAsync(product)
-               from response in ProductResponse.FromProduct(savedProduct).ToSuccess<ProductResponse, IFailure>()
-               select response;
     }
 }

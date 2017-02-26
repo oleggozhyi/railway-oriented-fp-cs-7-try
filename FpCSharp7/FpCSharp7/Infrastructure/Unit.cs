@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FpCSharp7Failure
+namespace FpCSharp7.Infrastructure
 {
-    class Program
+    public class Unit
     {
-        static void Main(string[] args)
-        {
-        }
     }
 }

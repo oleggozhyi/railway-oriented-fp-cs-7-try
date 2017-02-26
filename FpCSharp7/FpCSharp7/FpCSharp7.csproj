@@ -45,6 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Http\ProductController.cs" />
+    <Compile Include="Infrastructure\Extensions.cs" />
+    <Compile Include="Infrastructure\Failure.cs" />
+    <Compile Include="Infrastructure\Result.cs" />
+    <Compile Include="Infrastructure\ResultExtensions.cs" />
+    <Compile Include="Infrastructure\Unit.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -52,5 +58,6 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
